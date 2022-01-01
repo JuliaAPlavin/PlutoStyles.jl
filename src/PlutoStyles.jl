@@ -57,6 +57,17 @@ overrides() = [
         opacity: 0.85;
     }
     """, first),
+    AddToFile(r"/Pluto/\w+/frontend/index.css$", """
+    li.recent > a:after, li.running > a:after {
+        display: block;
+        content: attr(title);
+        font-size: x-small;
+    }
+
+    li > a[title*="/pluto_notebooks/"] {
+        color: rgb(16 113 109);
+    }
+    """, first),
     nothing
 ]
 

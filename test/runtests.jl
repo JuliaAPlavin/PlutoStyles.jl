@@ -1,9 +1,4 @@
+# for now smoke test only
 using PlutoStyles
-using Test
 
-@testset begin
-end
-
-
-import CompatHelperLocal as CHL
-CHL.@check()
+Pluto.run

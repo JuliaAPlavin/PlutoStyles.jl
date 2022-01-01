@@ -45,16 +45,12 @@ overrides() = [
         max-height: 15rem !important;
     }
 
+    /* obsolete? */
     /* limit width & wrap long types - common for tables */
     jltree > jlprefix.long {
         max-width: 250px;
         overflow-wrap: break-word;
         white-space: normal;
-    }
-
-    /* purely cosmetic */
-    #helpbox-wrapper {
-        opacity: 0.85;
     }
     """, first),
     AddToFile(r"/Pluto/\w+/frontend/index.css$", """

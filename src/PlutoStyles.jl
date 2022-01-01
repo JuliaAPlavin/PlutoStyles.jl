@@ -45,6 +45,14 @@ overrides() = [
         max-height: 15rem !important;
     }
 
+    /* move cell popup menu to the left of its button */
+    pluto-input > button.delete_cell ul.input_context_menu {
+        left: calc(100% - var(--width) - 36px) !important;
+    }
+    pluto-input > button.delete_cell  {
+        z-index: 31 !important;
+    }
+
     /* obsolete? */
     /* limit width & wrap long types - common for tables */
     jltree > jlprefix.long {

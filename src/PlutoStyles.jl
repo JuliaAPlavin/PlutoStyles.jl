@@ -94,4 +94,15 @@ function Pluto.asset_response(path)
     end
 end
 
+# taken with modification from
+# https://discourse.julialang.org/t/ann-plutostyles-jl-override-styles-of-pluto-notebooks/64280/9
+function run(args...; kwargs...)
+    if length(ARGS) > 0
+        notebook = ARGS[1]
+        Pluto.run(args...; notebook=abspath(notebook), kwargs...)
+    else
+        Pluto.run(args...; kwargs...)
+    end
+end
+
 end

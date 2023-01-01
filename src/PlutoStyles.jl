@@ -22,10 +22,10 @@ struct AddToFile
     position
 end
 
-full_content(x::AddToFile, data) = insert_addition(x.content, data, x.position)
+full_content(x::AddToFile, data) = insert_addition(data, x.content, x.position)
 
-insert_addition(old, new, position::typeof(first)) = old * data
-insert_addition(old, new, position::typeof(last)) = data * old
+insert_addition(old, new, position::typeof(first)) = new * old
+insert_addition(old, new, position::typeof(last)) = old * new
 
 struct AfterLines
     pattern
@@ -38,8 +38,17 @@ function insert_addition(old, new, position::AfterLines)
     join(lines_before, '\n') * new * join(lines_after, '\n')
 end
 
+struct ReplaceInFile
+    regex::Regex
+    replace_spec
+end
+
+full_content(x::ReplaceInFile, data) = replace(data, x.replace_spec)
+
 
 overrides() = [
+    ReplaceInFile(r"/Pluto/\w+/frontend(-dist)?/\w+.html",
+    r"""(<link [^>]+ )integrity="[^"]+" ([^>]+>)""" => s"\1\2"),
     AddToFile(r"/Pluto/\w+/frontend(-dist)?/editor(|\.\w+).css$", """
     /* occupy full width */
     body main {
@@ -67,7 +76,7 @@ overrides() = [
     pluto-input > .open.input_context_menu > ul, pluto-input > .open.input_context_menu {
         z-index: 31 !important;
     }
-    """, AfterLines(r"^(@import|\s*$)")),
+    """, last),
     AddToFile(r"/Pluto/\w+/frontend(-dist)?/index(|\.\w+).css$", """
     li.recent > a:after, li.running > a:after {
         display: block;

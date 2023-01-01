@@ -42,7 +42,7 @@ end
 overrides() = [
     AddToFile(r"/Pluto/\w+/frontend(-dist)?/editor(|\.\w+).css$", """
     /* occupy full width */
-    body > main {
+    body main {
         max-width: calc(100% - 2em) !important;
         margin-left: 1em !important;
         margin-right: 1em !important;

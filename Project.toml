@@ -1,7 +1,7 @@
 name = "PlutoStyles"
 uuid = "16e07271-a41c-4e3e-b73a-b807cf2ea0eb"
 authors = ["Alexander Plavin <alexander@plav.in>"]
-version = "0.1.5"
+version = "0.1.6"
 
 [deps]
 Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"

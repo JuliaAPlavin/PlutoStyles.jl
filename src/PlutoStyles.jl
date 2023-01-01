@@ -19,13 +19,28 @@ full_content(x::ReplaceFile, data) = read(x.new_path, String)
 struct AddToFile
     regex::Regex
     content::String
-    position::Union{typeof(first), typeof(last)}
+    position
 end
 
-full_content(x::AddToFile, data) = x.position == first ? x.content * data : data * x.content
+full_content(x::AddToFile, data) = insert_addition(x.content, data, x.position)
+
+insert_addition(old, new, position::typeof(first)) = old * data
+insert_addition(old, new, position::typeof(last)) = data * old
+
+struct AfterLines
+    pattern
+end
+
+function insert_addition(old, new, position::AfterLines)
+    lines = split(old, '\n')
+    lines_before = Iterators.takewhile(l -> occursin(position.pattern, l), lines)
+    lines_after = Iterators.dropwhile(l -> occursin(position.pattern, l), lines)
+    join(lines_before, '\n') * new * join(lines_after, '\n')
+end
+
 
 overrides() = [
-    AddToFile(r"/Pluto/\w+/frontend-dist/editor(|\.\w+).css$", """
+    AddToFile(r"/Pluto/\w+/frontend(-dist)?/editor(|\.\w+).css$", """
     /* occupy full width */
     body > main {
         max-width: calc(100% - 2em) !important;
@@ -52,8 +67,8 @@ overrides() = [
     pluto-input > .open.input_context_menu > ul, pluto-input > .open.input_context_menu {
         z-index: 31 !important;
     }
-    """, first),
-    AddToFile(r"/Pluto/\w+/frontend-dist/index(|\.\w+).css$", """
+    """, AfterLines(r"^(@import|\s*$)")),
+    AddToFile(r"/Pluto/\w+/frontend(-dist)?/index(|\.\w+).css$", """
     li.recent > a:after, li.running > a:after {
         display: block;
         content: attr(title);
@@ -63,7 +78,7 @@ overrides() = [
     li > a[title*="/pluto_notebooks/"] {
         color: rgb(16 113 109);
     }
-    """, first),
+    """, AfterLines(r"^(@import|\s*$)")),
     nothing
 ]
 

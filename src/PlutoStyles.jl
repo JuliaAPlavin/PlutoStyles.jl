@@ -92,8 +92,7 @@ function Pluto.asset_response(path; cacheable::Bool=false)
         override = first(filter(o -> is_match(o, path), overrides()))
         @debug "" path override
         response = Pluto.HTTP.Response(200, full_content(override, data))
-        m = Pluto.mime_fromfilename(path)
-        push!(response.headers, "Content-Type" => Base.istextmime(m) ? "$(m); charset=UTF-8" : string(m))
+        push!(response.headers, "Content-Type" => Pluto.MIMEs.contenttype_from_mime(Pluto.MIMEs.mime_from_path(path)))
         push!(response.headers, "Access-Control-Allow-Origin" => "*")
         # don't add content-length and cache-control headings
         response

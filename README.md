@@ -1,6 +1,6 @@
 # PlutoStyles.jl
 
-Add the ability to override CSS styles of Pluto.jl notebooks - or any other static Pluto asset, really.
+Globally override styles of Pluto.jl notebooks.
 
 Styles I use myself get applied by default:
 
@@ -10,6 +10,8 @@ julia> using PlutoStyles
 julia> Pluto.run()
 ```
 See the package source code for the actual CSS.
+
+Screenshots and discussion: see the [discourse thread](https://discourse.julialang.org/t/ann-plutostyles-jl-override-styles-of-pluto-notebooks/64280).
 
 Arbitrary overrides are possible:
 

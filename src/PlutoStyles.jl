@@ -5,7 +5,7 @@ export Pluto
 import Pluto
 
 
-full_content(x::Nothing, path) = read(path, String)
+full_content(x::Nothing, data) = data
 is_match(x, str) = occursin(x.regex, str)
 is_match(x::Nothing, str) = true
 
@@ -14,7 +14,7 @@ struct ReplaceFile
     new_path::String
 end
 
-full_content(x::ReplaceFile, path) = read(x.new_path, String)
+full_content(x::ReplaceFile, data) = read(x.new_path, String)
 
 struct AddToFile
     regex::Regex
@@ -22,12 +22,12 @@ struct AddToFile
     position::Union{typeof(first), typeof(last)}
 end
 
-full_content(x::AddToFile, path) = x.position == first ? x.content * read(path, String) : read(path, String) * x.content
+full_content(x::AddToFile, data) = x.position == first ? x.content * data : data * x.content
 
 overrides() = [
-    AddToFile(r"/Pluto/\w+/frontend/editor.css$", """
+    AddToFile(r"/Pluto/\w+/frontend-dist/editor(|\.\w+).css$", """
     /* occupy full width */
-    main {
+    body > main {
         max-width: calc(100% - 2em) !important;
         margin-left: 1em !important;
         margin-right: 1em !important;
@@ -46,22 +46,14 @@ overrides() = [
     }
 
     /* move cell popup menu to the left of its button */
-    pluto-input > button.delete_cell ul.input_context_menu {
+    pluto-input > .open.input_context_menu > ul {
         left: calc(100% - var(--width) - 36px) !important;
     }
-    pluto-input > button.delete_cell  {
+    pluto-input > .open.input_context_menu > ul, pluto-input > .open.input_context_menu {
         z-index: 31 !important;
     }
-
-    /* obsolete? */
-    /* limit width & wrap long types - common for tables */
-    jltree > jlprefix.long {
-        max-width: 250px;
-        overflow-wrap: break-word;
-        white-space: normal;
-    }
     """, first),
-    AddToFile(r"/Pluto/\w+/frontend/index.css$", """
+    AddToFile(r"/Pluto/\w+/frontend-dist/index(|\.\w+).css$", """
     li.recent > a:after, li.running > a:after {
         display: block;
         content: attr(title);
@@ -76,20 +68,22 @@ overrides() = [
 ]
 
 # original version copied from https://github.com/fonsp/Pluto.jl/blob/main/src/webserver/Static.jl
-function Pluto.asset_response(path)
+function Pluto.asset_response(path; cacheable::Bool=false)
     if !isfile(path) && !endswith(path, ".html")
-        return asset_response(path * ".html")
+        return Pluto.asset_response(path * ".html"; cacheable)
     end
-    try
-        @assert isfile(path)
+    if isfile(path)
+        data = read(path, String)
         override = first(filter(o -> is_match(o, path), overrides()))
-        response = Pluto.HTTP.Response(200, full_content(override, path))
+        @debug "" path override
+        response = Pluto.HTTP.Response(200, full_content(override, data))
         m = Pluto.mime_fromfilename(path)
         push!(response.headers, "Content-Type" => Base.istextmime(m) ? "$(m); charset=UTF-8" : string(m))
         push!(response.headers, "Access-Control-Allow-Origin" => "*")
+        # don't add content-length and cache-control headings
         response
-    catch e
-        @show path e
+    else
+        @warn "404" path
         Pluto.HTTP.Response(404, "Not found!")
     end
 end

@@ -87,6 +87,10 @@ overrides() = [
     li > a[title*="/pluto_notebooks/"] {
         color: rgb(16 113 109);
     }
+
+    ul#recent {
+        max-height: none;
+    }
     """, AfterLines(r"^(@import|\s*$)")),
     nothing
 ]

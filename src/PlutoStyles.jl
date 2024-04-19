@@ -1,5 +1,7 @@
 module PlutoStyles
 
+__precompile__(false)
+
 export Pluto
 
 import Pluto
